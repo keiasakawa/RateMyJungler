@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import {Button} from '@chakra-ui/react'
 import {AiFillStar, AiOutlineStar} from 'react-icons/ai'
+import {IconContext} from 'react-icons'
 
 const StarRater = ({setStarred, setRating}) => {
     const starsList = []
@@ -45,7 +46,7 @@ const StarRater = ({setStarred, setRating}) => {
             stars.map(star => {
                 return(
                     <Button key={star.level} onClick={() => selectStars(star.level)} variant='ghost' onMouseOver={() => highlightStars(star.level, true)} onMouseLeave={() => highlightStars(star.level, false)}>
-                        {star.enabled || star.selected ? <AiFillStar/> : <AiOutlineStar/>}
+                        {star.enabled || star.selected ? <IconContext.Provider value={{ color: "#FFD700"}}><AiFillStar/></IconContext.Provider> : <AiOutlineStar/>}
                     </Button>
                 )
             }))

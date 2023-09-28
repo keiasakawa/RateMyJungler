@@ -33,10 +33,17 @@ const ReviewModal = () => {
         onClose();
     }
 
+    const closeReview = () => {
+        setStarred(true);
+        setRating(0);
+        setReview('');
+        onClose();
+    }
+
     return (
         <>
         <Button onClick={onOpen}>Rate This Player</Button>
-        <Modal isOpen={isOpen} onClose={onClose}>
+        <Modal isOpen={isOpen} onClose={closeReview}>
             <ModalOverlay/>
             <ModalContent>
                 <ModalHeader>Leave a Review</ModalHeader>

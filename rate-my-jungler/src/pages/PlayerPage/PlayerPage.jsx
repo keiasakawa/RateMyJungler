@@ -24,13 +24,7 @@ const PlayerPage = () => {
           }
       }
       }
-  
 
-      useEffect(() => {
-        getSummoner();
-      }, []);
-
-      useEffect(() => {
         async function getRatings() {
           try {
             let res = await limiter.schedule(() => instance.get(`ratings/${player.accountId}`));
@@ -42,7 +36,24 @@ const PlayerPage = () => {
             }
         }
         }
+  
 
+      useEffect(() => {
+        getSummoner();
+      }, []);
+
+      useEffect(() => {
+        // async function getRatings() {
+        //   try {
+        //     let res = await limiter.schedule(() => instance.get(`ratings/${player.accountId}`));
+        //     setRatings(res.data)
+        //   }
+        //   catch (err){
+        //     if (err instanceof Error) {
+        //       console.log(err.message)
+        //     }
+        // }
+        // }
         getRatings();
       }, [player])
       
@@ -53,7 +64,7 @@ const PlayerPage = () => {
       <Text>Player Name: {player.name}</Text>
       <Text>Level: {player.summonerLevel}</Text>
 
-      <ReviewModal/>
+      <ReviewModal accountId={player.accountId} getRatings={getRatings}/>
 
       <Heading>Reviews</Heading>
       <Stack spacing='4'>

@@ -1,4 +1,5 @@
 import {React, useState} from 'react';
+import PropTypes from 'prop-types';
 import {
     Button,
     Modal,
@@ -12,8 +13,9 @@ import {
     Textarea,
   } from '@chakra-ui/react'
 import {StarRater} from './StarRater'
+import {instance} from '../../utils';
 
-const ReviewModal = () => {
+const ReviewModal = ({accountId, getRatings}) => {
     const { isOpen, onOpen, onClose} = useDisclosure()
     const [review, setReview] = useState('');
     const [starred, setStarred] = useState(true);
@@ -24,12 +26,22 @@ const ReviewModal = () => {
         setReview(inputValue)
       }
 
-    const postReview = () => {
-        console.log(rating);
-        console.log(review);
+    const postReview = async () => {
+        try {
+            await instance.post('ratings',
+            {
+                accountId: accountId,
+                stars: rating,
+                message: review
+            })
+        }
+        catch(err) {
+            console.log(err)
+        }
         setStarred(true);
         setRating(0);
         setReview('');
+        getRatings();
         onClose();
     }
 
@@ -67,5 +79,10 @@ const ReviewModal = () => {
 
     )
 }
+
+ReviewModal.propTypes = {
+    accountId: PropTypes.string,
+    getRatings: PropTypes.func
+};
 
 export {ReviewModal};

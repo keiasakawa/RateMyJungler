@@ -1,5 +1,5 @@
-import {React, useState} from 'react';
-import {Input, Card, CardHeader, CardBody, Image, Stack, Button} from '@chakra-ui/react'
+import React, {useState} from 'react';
+import {Input, Card, CardHeader, CardBody, Image, Stack, Button, Box} from '@chakra-ui/react'
 import {instance} from '../../utils';
 import {useNavigate} from "react-router-dom";
 

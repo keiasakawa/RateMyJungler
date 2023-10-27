@@ -1,52 +1,75 @@
 import React, {useState, useEffect} from 'react';
-import { Image, Text, Heading, Card, CardHeader, CardBody, Box, Stack, Container, Center, Button } from '@chakra-ui/react'
+import { Image, Text, Heading, Card, CardHeader, CardBody, Box, Stack, Container, Center, Button, Flex } from '@chakra-ui/react'
 import {instance} from '../../utils';
 import {limiter} from '../../limiter';
 import {ReviewModal} from './ReviewModal'
 import {AiFillStar, AiOutlineStar} from 'react-icons/ai'
-import {MdKeyboardArrowLeft, MdKeyboardArrowRight} from 'react-icons/md'
-import {RxDoubleArrowLeft, RxDoubleArrowRight} from 'react-icons/rx'
 import { IconContext } from "react-icons";
+import SortingDropdown from '../../components/sort'
 
 const PlayerPage = () => {
-    const playerData = {accountId: '', profileIconId: 0, revisionDate: 0, name: '', id: '', puuid: '', summonerLevel: 0}
-    const [player, setPlayer] = useState(playerData);
+    const [player, setPlayer] = useState({});
+    const [info, setInfo] = useState({})
     const [ratings, setRatings] = useState([])
+    const [numRatings, setNumRatings] = useState(20)
+    const [sort, setSort] = useState('recent')
 
     async function getSummoner() {
         try {
             const urlParams = new URLSearchParams(window.location.search);
             const player = urlParams.get('playerName');
             let res = await limiter.schedule(() => instance.get(`summoner/${player}`));
-            setPlayer(res.data)
+            setPlayer(player => ({...player, ...res.data}))
         }
         catch (err){
           if (err instanceof Error) {
             console.log(err.message)
           }
       }
+    } 
+    async function getRatings() {
+      try {
+        let res = await limiter.schedule(() => instance.get(`ratings/${player.accountId}?sort=${sort}`));
+        console.log(res.data)
+        setRatings(res.data)
       }
+      catch (err){
+        if (err instanceof Error) {
+          console.log(err.message)
+        }
+    }
+    }
 
-        async function getRatings() {
-          try {
-            let res = await limiter.schedule(() => instance.get(`ratings/${player.accountId}`));
-            setRatings(res.data)
+        function calculateWinrate() {
+
+          if (info.wins + info.losses === 0){
+            return 0
           }
-          catch (err){
-            if (err instanceof Error) {
-              console.log(err.message)
-            }
+          return (info.wins / (info.wins + info.losses) * 100).toFixed(1)
         }
-        }
-  
 
       useEffect(() => {
         getSummoner();
       }, []);
 
       useEffect(() => {
-        getRatings();
+        async function getInfo() {
+          try {
+            let res = await limiter.schedule(() => instance.get(`info/${player.id}`));
+            setInfo(info => ({...info, ...res.data[0]}))
+          }
+          catch (err) {
+            if (err instanceof Error) {
+              console.log(err.message)
+            }
+          }
+        }
+        getInfo()
       }, [player])
+
+      useEffect(() => {
+        getRatings();
+      }, [player, sort])
       
 
     return (
@@ -54,9 +77,11 @@ const PlayerPage = () => {
       <Container maxW='100%'>
         <Center>
           <Stack>
-            <Image src={`http://ddragon.leagueoflegends.com/cdn/13.12.1/img/profileicon/${player.profileIconId}.png`} alt='profilepic' />
+            <Image src={`http://ddragon.leagueoflegends.com/cdn/13.21.1/img/profileicon/${player.profileIconId}.png`} alt='profilepic' />
             <Text>Player Name: {player.name}</Text>
             <Text>Level: {player.summonerLevel}</Text>
+            <Text>Win Rate: {calculateWinrate()}%</Text>
+            <Text>Rank: {info.tier} {info.rank}</Text>
           </Stack>
         </Center>
 
@@ -64,45 +89,46 @@ const PlayerPage = () => {
         <ReviewModal accountId={player.accountId} getRatings={getRatings}/>
         </Center>
 
-        <Heading>Reviews</Heading>
-        <Container maxW='container.m' mb={20}>
-          <Stack spacing='4'>
-          {
-            ratings.map(rating => {
-              return (
-                <Card key={rating._id} variant='filled'>
-                  <CardHeader>
-                    <Heading size='md'>
-                      <Box display='flex'>
-                      {Array(5).fill('').map((_, i) => {
-                        return i < rating.stars ? <IconContext.Provider value={{ color: "#FFD700"}}><AiFillStar key={i}/></IconContext.Provider> : <AiOutlineStar key={i}/>
-                      }
-                        )}
+        <Container maxW='90%'>
+          <Stack>
+          <Heading>Reviews</Heading>
+          <SortingDropdown setSort={setSort}/>
+          <Container maxW='100%' padding='0' mb={20}>
+            <Stack spacing='4'>
+            {
+              ratings.slice(0, numRatings).map(rating => {
+                return (
+                  <Card key={rating._id} variant='filled'>
+                    <CardHeader>
+                      <Flex spacing = '4'>
+                        <Heading size='md'>
+                          <Box display='flex'>
+                          {Array(5).fill('').map((_, i) => {
+                            return i < rating.stars ? <IconContext.Provider value={{ color: "#FFD700"}}><AiFillStar key={i}/></IconContext.Provider> : <AiOutlineStar key={i}/>
+                          }
+                            )}
+                            </Box>
+
+
+                        </Heading>
+                        <Text>{new Date(rating.datetime).toLocaleDateString('en-us', {year: 'numeric', month:'short', day:'numeric'})}</Text>
+                      </Flex>
+                      </CardHeader>
+                      <CardBody>
+                        <Box>
+                          <Text>{rating.message}</Text>
                         </Box>
-                    </Heading>
-                    </CardHeader>
-                    <CardBody>
-                      <Box>
-                        <Text>{rating.message}</Text>
-                      </Box>
-                    </CardBody>
-                </Card>
-              )
-            })
-          }
+                      </CardBody>
+                  </Card>
+                )
+              })
+            }
+            </Stack>
+          </Container>
+          <Center>
+            {numRatings < ratings.length && <Button onClick={() => setNumRatings(numRatings + 20)}>Load More Ratings</Button>}
+          </Center>
           </Stack>
-          <Button>
-            <RxDoubleArrowLeft />
-          </Button>
-          <Button>
-            <MdKeyboardArrowLeft />
-          </Button>
-          <Button>
-            <MdKeyboardArrowRight />
-          </Button>
-          <Button>
-            <RxDoubleArrowRight />
-          </Button>
         </Container>
       </Container>
       </>

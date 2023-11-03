@@ -6,20 +6,25 @@ import {ReviewModal} from './ReviewModal'
 import {AiFillStar, AiOutlineStar} from 'react-icons/ai'
 import { IconContext } from "react-icons";
 import SortingDropdown from '../../components/sort'
+import Distribution from '../../components/ratingDistribution'
+import './PlayerPage.css'
 
 const PlayerPage = () => {
     const [player, setPlayer] = useState({});
-    const [info, setInfo] = useState({})
-    const [ratings, setRatings] = useState([])
     const [numRatings, setNumRatings] = useState(20)
     const [sort, setSort] = useState('recent')
+    const [isLoading, setIsLoading] = useState(true)
 
     async function getSummoner() {
         try {
             const urlParams = new URLSearchParams(window.location.search);
-            const player = urlParams.get('playerName');
-            let res = await limiter.schedule(() => instance.get(`summoner/${player}`));
-            setPlayer(player => ({...player, ...res.data}))
+            const playerName = urlParams.get('playerName');
+            let res = await limiter.schedule(() => instance.get(`summoner/${playerName}`));
+            let info = await limiter.schedule(() => instance.get(`info/${res.data.id}`));
+            let ratings = await limiter.schedule(() => instance.get(`ratings/${res.data.accountId}?sort=${sort}`));
+
+            setPlayer({...res.data, info: info.data[0], ratings: ratings.data})
+            setIsLoading(false)
         }
         catch (err){
           if (err instanceof Error) {
@@ -27,76 +32,72 @@ const PlayerPage = () => {
           }
       }
     } 
-    async function getRatings() {
+
+    async function updateRatings(newSort) {
+      console.log('enter')
       try {
-        let res = await limiter.schedule(() => instance.get(`ratings/${player.accountId}?sort=${sort}`));
-        console.log(res.data)
-        setRatings(res.data)
+        let ratings = await limiter.schedule(() => instance.get(`ratings/${player.accountId}?sort=${newSort}`));
+      setPlayer(oldState => ({...oldState, ratings:ratings.data}))
       }
-      catch (err){
+      catch(err) {
         if (err instanceof Error) {
           console.log(err.message)
         }
-    }
+      }
     }
 
-        function calculateWinrate() {
 
-          if (info.wins + info.losses === 0){
-            return 0
-          }
-          return (info.wins / (info.wins + info.losses) * 100).toFixed(1)
+      function calculateWinrate() {
+        if (player.info.wins + player.info.losses === 0){
+          return 0
         }
+        return (player.info.wins / (player.info.wins + player.info.losses) * 100).toFixed(1)
+      }
 
       useEffect(() => {
         getSummoner();
       }, []);
 
-      useEffect(() => {
-        async function getInfo() {
-          try {
-            let res = await limiter.schedule(() => instance.get(`info/${player.id}`));
-            setInfo(info => ({...info, ...res.data[0]}))
-          }
-          catch (err) {
-            if (err instanceof Error) {
-              console.log(err.message)
-            }
-          }
-        }
-        getInfo()
-      }, [player])
-
-      useEffect(() => {
-        getRatings();
-      }, [player, sort])
+      function getAverage() {
+        let total = 0.0
+        player.ratings.forEach((element) => {
+          total += element.stars
+        })
+        const average_rounded = Math.round((total / player.ratings.length) * 100) / 100
+        return average_rounded
+      }
       
 
     return (
       <>
+      {!isLoading &&
       <Container maxW='100%'>
-        <Center>
-          <Stack>
-            <Image src={`http://ddragon.leagueoflegends.com/cdn/13.21.1/img/profileicon/${player.profileIconId}.png`} alt='profilepic' />
-            <Text>Player Name: {player.name}</Text>
-            <Text>Level: {player.summonerLevel}</Text>
-            <Text>Win Rate: {calculateWinrate()}%</Text>
-            <Text>Rank: {info.tier} {info.rank}</Text>
-          </Stack>
-        </Center>
+        <Container marginLeft='5%' marginTop='5%'>
+          <Flex maxW='100%' maxH='100%'>
+            <Stack className="profile" >
+              <Image borderRadius='full' maxH='50%' maxW='50%' src={`http://ddragon.leagueoflegends.com/cdn/13.21.1/img/profileicon/${player.profileIconId}.png`} alt='profilepic' />
+              <Text>Player Name: {player.name}</Text>
+              <Text className='rating' as='b'>{getAverage()} / 5</Text>
+              <Text>Level: {player.summonerLevel}</Text>
+              <Text>Win Rate: {calculateWinrate()}%</Text>
+              <Text>Rank: {player.info.tier} {player.info.rank}</Text>
+            </Stack>
+            <Distribution ratings={player.ratings}/>
+          </Flex>
+        </Container>
 
         <Center>
-        <ReviewModal accountId={player.accountId} getRatings={getRatings}/>
+        <ReviewModal accountId={player.accountId}/>
         </Center>
 
         <Container maxW='90%'>
           <Stack>
           <Heading>Reviews</Heading>
-          <SortingDropdown setSort={setSort}/>
+          <SortingDropdown updateRatings={updateRatings} setSort={setSort}/>
           <Container maxW='100%' padding='0' mb={20}>
             <Stack spacing='4'>
-            {
-              ratings.slice(0, numRatings).map(rating => {
+            { player &&
+              player.ratings.slice(0, numRatings).map(rating => {
                 return (
                   <Card key={rating._id} variant='filled'>
                     <CardHeader>
@@ -124,13 +125,14 @@ const PlayerPage = () => {
               })
             }
             </Stack>
-          </Container>
-          <Center>
-            {numRatings < ratings.length && <Button onClick={() => setNumRatings(numRatings + 20)}>Load More Ratings</Button>}
-          </Center>
+            <Center mt={10}>
+              {numRatings < player.ratings.length && <Button onClick={() => setNumRatings(numRatings + 20)}>Load More Ratings</Button>}
+            </Center>
+            </Container>
           </Stack>
         </Container>
       </Container>
+}
       </>
     )
 }

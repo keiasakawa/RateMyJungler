@@ -7,9 +7,9 @@
 import React from 'react'
 import {Select} from '@chakra-ui/react'
 
-const SortingDropdown = ({setSort}) => {
+const SortingDropdown = ({updateRatings, setSort}) => {
     return (
-        <Select defaultValue={'recent'} id='sortDropdown' maxW={300} onChange={e => setSort(e.target.value)}>
+        <Select defaultValue={'recent'} id='sortDropdown' maxW={300} onChange={e => {updateRatings(e.target.value); setSort(e.target.value)}}>
             <option value='recent'>Most Recent</option>
             <option value='oldest'>Oldest Ratings</option>
             <option value='highest'>Highest Ratings</option>

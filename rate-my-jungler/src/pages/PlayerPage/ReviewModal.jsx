@@ -15,7 +15,7 @@ import {
 import {StarRater} from './StarRater'
 import {instance} from '../../utils';
 
-const ReviewModal = ({accountId, getRatings}) => {
+const ReviewModal = ({accountId, updateRatings}) => {
     const { isOpen, onOpen, onClose} = useDisclosure()
     const [review, setReview] = useState('');
     const [starred, setStarred] = useState(true);
@@ -32,7 +32,8 @@ const ReviewModal = ({accountId, getRatings}) => {
             {
                 accountId: accountId,
                 stars: rating,
-                message: review
+                message: review,
+                datetime: Date.now()
             })
         }
         catch(err) {
@@ -41,7 +42,7 @@ const ReviewModal = ({accountId, getRatings}) => {
         setStarred(true);
         setRating(0);
         setReview('');
-        getRatings();
+        updateRatings();
         onClose();
     }
 
@@ -82,7 +83,7 @@ const ReviewModal = ({accountId, getRatings}) => {
 
 ReviewModal.propTypes = {
     accountId: PropTypes.string,
-    getRatings: PropTypes.func
+    updateRatings: PropTypes.func
 };
 
 export {ReviewModal};

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {Text, Stack, Box, Flex} from '@chakra-ui/react';
 
 const Distribution = ({ratings}) => {
@@ -23,24 +23,11 @@ const Distribution = ({ratings}) => {
         )
     }
 
-    // useEffect(() => {
-    //     let newMap = new Map()
-    //     ratings.forEach((element) => {
-    //         if (newMap.has(element.stars)) {
-    //             newMap.set(element.stars, newMap.get(element.stars) + 1)
-    //         }
-    //         else {
-    //             newMap.set(element.stars, 1)
-    //         }
-    //     })
-    //     setDistribution(newMap)
-    // }, [ratings]) 
-
     return (
         <>
         <Stack>
         {Array(5).fill('').map((_, i) => {
-            return distribution.get(5 - i) ? <><Text>{5 - i}</Text> {returnBar(distribution.get(5-i))}</> : <><Text>{i}</Text><Box h='10px' bg='grey' w='50px'/></>
+            return distribution.get(5 - i) ? <><Text>{5 - i}</Text> {returnBar(distribution.get(5-i))}</> : <><Text>{i}</Text><Box h='10px' bg='grey' w='200px'/></>
           })}
           </Stack>
           </>

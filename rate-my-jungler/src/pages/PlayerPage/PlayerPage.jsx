@@ -87,7 +87,7 @@ const PlayerPage = () => {
         </Container>
 
         <Center>
-        <ReviewModal accountId={player.accountId}/>
+        <ReviewModal accountId={player.accountId} updateRatings={updateRatings}/>
         </Center>
 
         <Container maxW='90%'>

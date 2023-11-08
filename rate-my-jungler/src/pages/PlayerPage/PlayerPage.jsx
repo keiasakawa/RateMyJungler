@@ -1,5 +1,5 @@
 import {useState, useEffect} from 'react';
-import { Image, Text, Heading, Card, CardHeader, CardBody, Box, Stack, Container, Center, Button, Flex, Spacer } from '@chakra-ui/react'
+import { Image, Text, Heading, Card, CardHeader, CardBody, Box, Stack, Container, Center, Button, Flex} from '@chakra-ui/react'
 import {instance} from '../../utils';
 import {limiter} from '../../limiter';
 import {ReviewModal} from './ReviewModal'
@@ -87,11 +87,12 @@ const PlayerPage = () => {
       {isLoading && 
       <Container maxW='100%' h='100vh'>
         <Center h='100%'>
-          <Loader/>
+            <Loader/>
           </Center>
           </Container>}
       {!isLoading &&
       <Container maxW='100%'>
+        
         <SearchBar/>
         <Container maxW='90%' marginX='5%' marginTop='5%'>
           <Flex w='30%' justifyContent='space-between'>

@@ -42,7 +42,7 @@ const PlayerPage = () => {
     
 
     // Update the ratings
-    async function updateRatings(newSort) {
+    async function updateRatings(newSort: String) {
       try {
         let ratings = await limiter.schedule(() => instance.get(`ratings/${player.accountId}?sort=${newSort}`));
       setPlayer(oldState => ({...oldState, ratings:ratings.data}))
@@ -70,9 +70,10 @@ const PlayerPage = () => {
       }, []);
 
       function getAverage() {
-        if (Object.keys(player.info).length === 0) {
+        if (player.ratings.length === 0) {
           return `No Ratings`
         }
+
         let total = 0.0
         player.ratings.forEach((element) => {
           total += element.stars

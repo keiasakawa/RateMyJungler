@@ -1,7 +1,7 @@
 import React from 'react';
 import {Text, Stack, Box, Flex} from '@chakra-ui/react';
 
-const Distribution = ({ratings}) => {
+const Distribution = (ratings : Array) => {
     let distribution = new Map()
     ratings.forEach((element) => {
         if (distribution.has(element.stars)) {
@@ -13,7 +13,7 @@ const Distribution = ({ratings}) => {
     })
 
     // Return the bar colored up to the percent of stars
-    const returnBar = (numRatings) => {
+    const returnBar = (numRatings : Integer) => {
         const getPercent = numRatings / ratings.length
         return (
             <>

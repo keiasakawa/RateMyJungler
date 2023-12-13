@@ -1,7 +1,7 @@
 import React from 'react';
 import {Text, Stack, Box, Flex} from '@chakra-ui/react';
 
-const Distribution = (ratings : Array) => {
+const Distribution = ({ratings}) => {
     let distribution = new Map()
     ratings.forEach((element) => {
         if (distribution.has(element.stars)) {

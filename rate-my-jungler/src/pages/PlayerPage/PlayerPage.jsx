@@ -28,7 +28,7 @@ const PlayerPage = () => {
             // NOTE: If the player doesn't have any stats for the season, then this is empty
             let info = await limiter.schedule(() => instance.get(`info/${res.data.id}`));
 
-            let ratings = await limiter.schedule(() => instance.get(`ratings/${res.data.accountId}?sort=${sort}`));
+            let ratings: Array = await limiter.schedule(() => instance.get(`ratings/${res.data.puuid}?sort=${sort}`));
 
             setPlayer({...res.data, info: info.data.length > 0 ? info.data[0]: {}, ratings: ratings.data})
             setIsLoading(false)
@@ -44,7 +44,9 @@ const PlayerPage = () => {
     // Update the ratings
     async function updateRatings(newSort: String) {
       try {
-        let ratings = await limiter.schedule(() => instance.get(`ratings/${player.accountId}?sort=${newSort}`));
+        console.log(newSort)
+        let ratings: Array = await limiter.schedule(() => instance.get(`ratings/${player.puuid}?sort=${newSort}`));
+        console.log(ratings)
       setPlayer(oldState => ({...oldState, ratings:ratings.data}))
       }
       catch(err) {
@@ -56,6 +58,7 @@ const PlayerPage = () => {
 
       // Return a string of the winrate
       function calculateWinrate() {
+        console.log(player)
         if (Object.keys(player.info).length === 0) {
           return 'None'
         }
@@ -105,12 +108,13 @@ const PlayerPage = () => {
               <Text>Win Rate: {calculateWinrate()}</Text>
               <Text>Rank: {Object.keys(player.info).length === 0 ? 'No Rank' : `${player.info.tier} ${player.info.rank}`}</Text>
             </Stack>
+            {console.log(player.ratings)}
             <Distribution ratings={player.ratings}/>
           </Flex>
         </Container>
 
         <Center>
-        <ReviewModal accountId={player.accountId} updateRatings={updateRatings}/>
+        <ReviewModal puuid={player.puuid} updateRatings={updateRatings} sort={sort}/>
         </Center>
 
         <Container maxW='90%'>

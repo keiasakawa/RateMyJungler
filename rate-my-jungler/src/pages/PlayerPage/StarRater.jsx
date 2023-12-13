@@ -4,7 +4,7 @@ import {Button} from '@chakra-ui/react'
 import {AiFillStar, AiOutlineStar} from 'react-icons/ai'
 import {IconContext} from 'react-icons'
 
-const StarRater = (setStarred: Function, setRating : Function) => {
+const StarRater = ({setStarred, setRating}) => {
     const starsList = []
     for (let i = 1; i < 6; i++){
         starsList.push({selected: false, enabled: false, level: i})

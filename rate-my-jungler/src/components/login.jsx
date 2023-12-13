@@ -15,7 +15,7 @@ import {
   } from '@chakra-ui/react'
 import {instance} from '../utils'
 
-  const LoginButton = (setToken) => {
+  const LoginButton = ({setToken}) => {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')

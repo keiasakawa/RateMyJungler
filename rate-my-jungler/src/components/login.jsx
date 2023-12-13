@@ -25,7 +25,7 @@ import {instance} from '../utils'
         await instance.post('user/login', loginInfo)
         .then((res) => {console.log(res)})
         .catch((err) => {
-            console.log(err)
+            console.log(err.response.data.message)
         })
     }
     return (

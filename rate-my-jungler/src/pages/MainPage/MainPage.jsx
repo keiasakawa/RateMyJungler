@@ -1,14 +1,14 @@
-import {useState} from 'react';
-import {Center} from '@chakra-ui/react'
+import {Center, Container} from '@chakra-ui/react'
 import SearchBar from '../../components/searchBar'
 
 const MainPage = () => {
-    const [player, setPlayer] = useState('')
     return (
       <>
-        <Center>
-        <SearchBar/>
-        </Center>
+        <Container h="100vh">
+          <Center h="100%">
+            <SearchBar/>
+          </Center>
+        </Container>
       </>
       )
 }

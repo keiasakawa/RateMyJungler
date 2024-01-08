@@ -106,7 +106,7 @@ const PlayerPage = () => {
               <Text className='rating' as='b'>{getAverage()}</Text>
               <Text>Level: {player.summonerLevel}</Text>
               <Text>Win Rate: {calculateWinrate()}</Text>
-              <Text>Rank: {Object.keys(player.info).length === 0 ? 'No Rank' : `${player.info.tier} ${player.info.rank}`}</Text>
+              <Text>Rank: {!player.info.rank ? 'No Rank' : `${player.info.tier} ${player.info.rank}`}</Text>
             </Stack>
             {console.log(player.ratings)}
             <Distribution ratings={player.ratings}/>

@@ -1,11 +1,14 @@
 import { Text } from '@chakra-ui/react'
+import "./landingLogo.css"
 
 const LandingPageLogo = () => {
     return (
         <>
-            <span>R</span>
-            <span>M</span>
-            <span>J</span>
+            <span>
+                <span class='letter'>R</span>
+                <span class='letter'>M</span>
+                <span class='letter'>J</span>
+            </span>
         </>
     )
 }

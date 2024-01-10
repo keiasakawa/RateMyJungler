@@ -16,7 +16,7 @@ function App() {
     <>
       <ChakraProvider>
         <Router>
-          {!token && <LoginButton setToken={setToken}/>}
+          {/* {!token && <LoginButton setToken={setToken}/>} */}
           <Routes>
             <Route exact path="/" element = {<MainPage />} />
             <Route exact path="/player" element = {<PlayerPage />} />

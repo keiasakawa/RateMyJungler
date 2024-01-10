@@ -1,0 +1,13 @@
+
+.container:before {
+    content: ' ';
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.5;
+    background-image: url('https://1.bp.blogspot.com/-TvFKydrl6Gw/T7GkycAlwCI/AAAAAAAACGo/nENqwYJievE/s1600/Rift_1.1_Jungle.jpg');
+    background-size: cover;
+  }

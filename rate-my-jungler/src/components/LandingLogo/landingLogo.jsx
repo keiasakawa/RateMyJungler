@@ -2,13 +2,15 @@ import anime from 'animejs/lib/anime.es.js';
 import "./landingLogo.css"
 
 const LandingPageLogo = () => {
-    anime({
-        targets: '.logo path',
-        strokeDashoffset: [anime.setDashoffset, 0],
-        easing: 'easeInOutSine',
-        duration: 1500,
-        delay: function(el, i) { return i * 250 },
-        direction: 'normal'
+      window.addEventListener("load", (event) => {
+        anime({
+            targets: '.logo path',
+            strokeDashoffset: [anime.setDashoffset, 0],
+            easing: 'easeInOutSine',
+            duration: 1200,
+            delay: function(el, i) { return i * 150 },
+            direction: 'normal'
+          });
       });
     return (
         <>

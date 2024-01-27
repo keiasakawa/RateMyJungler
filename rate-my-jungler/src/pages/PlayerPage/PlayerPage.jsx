@@ -1,5 +1,6 @@
 import {useState, useEffect} from 'react';
 import { Image, Text, Heading, Card, CardHeader, CardBody, Box, Stack, Container, Center, Button, Flex} from '@chakra-ui/react'
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import {instance} from '../../utils';
 import {limiter} from '../../limiter';
 import {ReviewModal} from './ReviewModal'
@@ -16,6 +17,10 @@ const PlayerPage = () => {
     const [numRatings, setNumRatings] = useState(20)
     const [sort, setSort] = useState('recent')
     const [isLoading, setIsLoading] = useState(true)
+    const navigate = useNavigate();
+
+    const [searchParams, setSearchParams] = useSearchParams();
+    const id = searchParams.get("playerName");
 
 
     // Get the summoner name from params and get summoner, league entries, and current ratings
@@ -24,6 +29,10 @@ const PlayerPage = () => {
             const urlParams = new URLSearchParams(window.location.search);
             const playerName = urlParams.get('playerName');
             let res = await limiter.schedule(() => instance.get(`summoner/${playerName}`));
+
+            if (!res.data) {
+              navigate(`/`)
+            }
 
             // NOTE: If the player doesn't have any stats for the season, then this is empty
             let info = await limiter.schedule(() => instance.get(`info/${res.data.id}`));
@@ -72,6 +81,10 @@ const PlayerPage = () => {
         getSummoner();
       }, []);
 
+      useEffect(() => {
+        getSummoner();
+      }, [id]);
+
       function getAverage() {
         if (player.ratings.length === 0) {
           return `No Ratings`
@@ -89,17 +102,18 @@ const PlayerPage = () => {
     return (
       <>
       {isLoading && 
-      <Container maxW='100%' h='100vh'>
+      <Container maxW='100%' h='100vh' color="#59515e">
         <Center h='100%'>
             <Loader/>
           </Center>
           </Container>}
       {!isLoading &&
-      <Container maxW='100%'>
-        
-        <SearchBar/>
+      <Container maxW='100%' bg="#59515e">
+        <Flex pt="10px">
+          <SearchBar/>
+        </Flex>
         <Container maxW='90%' marginX='5%' marginTop='5%'>
-          <Flex w='30%' justifyContent='space-between'>
+          <Flex w='50%' justifyContent='space-between' gap="10%">
             <Stack className="profile" >
               <Image borderRadius='full' maxH='50%' maxW='50%' src={`http://ddragon.leagueoflegends.com/cdn/13.21.1/img/profileicon/${player.profileIconId}.png`} alt='profilepic' />
               <Text>Player Name: {player.name}</Text>
@@ -108,12 +122,11 @@ const PlayerPage = () => {
               <Text>Win Rate: {calculateWinrate()}</Text>
               <Text>Rank: {!player.info.rank ? 'No Rank' : `${player.info.tier} ${player.info.rank}`}</Text>
             </Stack>
-            {console.log(player.ratings)}
             <Distribution ratings={player.ratings}/>
           </Flex>
         </Container>
 
-        <Center>
+        <Center mt="10%">
         <ReviewModal puuid={player.puuid} updateRatings={updateRatings} sort={sort}/>
         </Center>
 
@@ -127,26 +140,23 @@ const PlayerPage = () => {
               player.ratings.slice(0, numRatings).map(rating => {
                 return (
                   <Card key={rating._id} variant='filled'>
-                    <CardHeader>
-                      <Flex spacing = '4'>
-                        <Heading size='md'>
-                          <Box display='flex'>
+                    <CardHeader pb={rating.message ? 0 : null}>
+                      <Flex gap = '40px'>
+                          <Box display='flex' alignItems='center'>
                           {Array(5).fill('').map((_, i) => {
-                            return i < rating.stars ? <IconContext.Provider value={{ color: "#FFD700"}}><AiFillStar key={i}/></IconContext.Provider> : <AiOutlineStar key={i}/>
+                            return i < rating.stars ? <IconContext.Provider value={{ color: "#FFD700"}}><AiFillStar size={20} key={i}/></IconContext.Provider> : <AiOutlineStar size={20} key={i}/>
                           }
                             )}
                             </Box>
-
-
-                        </Heading>
                         <Text>{new Date(rating.datetime).toLocaleDateString('en-us', {year: 'numeric', month:'short', day:'numeric'})}</Text>
                       </Flex>
                       </CardHeader>
+                      {rating.message &&
                       <CardBody>
                         <Box>
                           <Text>{rating.message}</Text>
                         </Box>
-                      </CardBody>
+                      </CardBody>}
                   </Card>
                 )
               })

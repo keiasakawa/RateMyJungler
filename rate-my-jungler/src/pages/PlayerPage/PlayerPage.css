@@ -5,3 +5,11 @@
 .profile .rating {
     font-size: 50px;
 }
+
+.chakra-text, .chakra-heading{
+    color: white
+}
+
+.chakra-card .chakra-text{
+    color: black;
+}

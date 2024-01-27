@@ -7,7 +7,14 @@ const SearchBar = () => {
     const navigate = useNavigate();
     const [search, setSearch] = useState('')
 
+    document.addEventListener("keypress", function(event) {
+        if(event.keyCode==13) {
+            getSummoner()
+        }
+    })
+
     async function getSummoner() {
+        if (search.length != 0) {
         try {
             navigate(`/player?playerName=${search}`)
 
@@ -19,13 +26,14 @@ const SearchBar = () => {
           }
       }
     }
+    }
 
     return (
         <InputGroup>
         <InputLeftElement pointerEvents='none'>
-            <SearchIcon />
+            <SearchIcon color="#EDF2F7"/>
         </InputLeftElement>
-        <Input value={search} placeholder='Enter player name' onChange={(e) => setSearch(e.target.value)}/>
+        <Input value={search} color="#EDF2F7" _placeholder={{ color: "#EDF2F7"}} placeholder='Enter player name' onChange={(e) => setSearch(e.target.value)}/>
         <InputRightElement width='6rem'>
             <Button h='1.75rem' onClick={getSummoner}>Search</Button>
         </InputRightElement>

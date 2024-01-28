@@ -8,6 +8,7 @@ import { ChakraProvider } from '@chakra-ui/react'
 
 import MainPage from './pages/MainPage/MainPage'
 import PlayerPage from './pages/PlayerPage/PlayerPage'
+import ErrorPage from './pages/ErrorPage/ErrorPage'
 
 function App() {
   const {token, setToken} = useToken();
@@ -20,6 +21,7 @@ function App() {
           <Routes>
             <Route exact path="/" element = {<MainPage />} />
             <Route exact path="/player" element = {<PlayerPage />} />
+            <Route exact path="/error" element = {<ErrorPage />} />
           </Routes>
         </Router>
       </ChakraProvider>

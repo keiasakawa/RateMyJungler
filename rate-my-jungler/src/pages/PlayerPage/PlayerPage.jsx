@@ -25,13 +25,13 @@ const PlayerPage = () => {
 
     // Get the summoner name from params and get summoner, league entries, and current ratings
     async function getSummoner() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const playerName = urlParams.get('playerName');
         try {
-            const urlParams = new URLSearchParams(window.location.search);
-            const playerName = urlParams.get('playerName');
             let res = await limiter.schedule(() => instance.get(`summoner/${playerName}`));
 
             if (!res.data) {
-              navigate(`/`)
+              navigate(`/error?playerName=${playerName}`)
             }
 
             // NOTE: If the player doesn't have any stats for the season, then this is empty
@@ -45,6 +45,7 @@ const PlayerPage = () => {
         catch (err){
           if (err instanceof Error) {
             console.log(err.message)
+            navigate(`/error?playerName=${playerName}`)
           }
       }
     } 
